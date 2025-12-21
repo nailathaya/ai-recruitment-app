@@ -1,8 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-from app.api import auth, candidates,job_postings
-
+from app.api import job_postings
+from app.api import auth, candidates,job_postings,deps,applications
 
 # =========================
 # APP INIT
@@ -28,7 +27,10 @@ app.add_middleware(
 # =========================
 app.include_router(auth.router)
 app.include_router(candidates.router)
-# app.include_router(job_postings.router)
+app.include_router(job_postings.router)
+# app.include_router(deps.router)
+app.include_router(applications.router)
+
 
 # =========================
 # ROOT CHECK

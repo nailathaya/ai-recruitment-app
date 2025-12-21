@@ -27,7 +27,11 @@ class User(Base):
     skills = relationship("Skill", back_populates="user")
     salary = relationship("SalaryExpectation", uselist=False)
     documents = relationship("Document", back_populates="user")
-    applications = relationship("Application", back_populates="user")
+    applications = relationship(
+        "Application",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
     activities = relationship("Activity", back_populates="user")
 
 class UserResponse(BaseModel):

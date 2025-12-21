@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import Optional,List
 from datetime import datetime, date
 
 
@@ -87,15 +87,26 @@ class DocumentRequest(BaseModel):
     fileSize: Optional[int] = None
 
 
-# class JobPostingCreateRequest(BaseModel):
-#     title: str
-#     department: str
-#     employment_type: str
-#     location: str
-#     description: str
+class JobPostingCreateRequest(BaseModel):
+    title: str
+    department: str
+    employment_type: str
+    location: str
+    description: str
 
-#     min_education: str
-#     min_experience_years: int = 0
+    min_education: str
+    min_experience_years: int
 
-#     closing_date: Optional[date]
-#     required_candidates: int = 1
+    closing_date: Optional[date] = None
+    required_candidates: int
+
+    # 🔥 WAJIB ADA
+    skills: List[str]
+    certifications: List[str]
+
+    class Config:
+        from_attributes = True  # Pydantic v2
+
+class ApplyJobRequest(BaseModel):
+    job_id: int
+

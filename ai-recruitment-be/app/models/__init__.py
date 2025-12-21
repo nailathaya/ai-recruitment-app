@@ -7,5 +7,8 @@ from .document import Document
 from .activity import Activity
 from .application import Application
 from .application_stage import ApplicationStage
-# from .job_posting import JobPosting
+from .job_posting import JobPosting
+from .job_skill import JobSkill
+from .job_certification import JobCertification
+
 
