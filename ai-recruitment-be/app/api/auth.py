@@ -58,7 +58,7 @@ def login_user(payload: LoginRequest, db: Session = Depends(get_db)):
             user = User(
                 full_name="HRD Admin",
                 email="hrd@test.com",
-                role="recruiter",
+                role="hrd",
                 online_status="online",
                 password=pwd_context.hash("password123"),
             )

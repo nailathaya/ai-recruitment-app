@@ -1,17 +1,15 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional,List
-from datetime import datetime, date
-
+from typing import Optional, List
+from datetime import date
 
 class CandidateDetailRequest(BaseModel):
-    candidate_id: str
+    candidate_id: int
 
 class CandidateSearchRequest(BaseModel):
     position: Optional[str] = None
     skill: Optional[str] = None
     min_salary: Optional[int] = None
     max_salary: Optional[int] = None
-
 
 class LLMQueryRequest(BaseModel):
     question: str
@@ -26,22 +24,10 @@ class LoginRequest(BaseModel):
     password: str
 
 class CandidateUpdateRequest(BaseModel):
-    name: str
-    location: str
-    phoneNumber: str
-
-# =====================
-# PROFILE
-# =====================
-class CandidateUpdateRequest(BaseModel):
     name: Optional[str] = None
     location: Optional[str] = None
     phoneNumber: Optional[str] = None
 
-
-# =====================
-# EXPERIENCE
-# =====================
 class ExperienceRequest(BaseModel):
     jobTitle: str
     companyName: str
@@ -49,10 +35,6 @@ class ExperienceRequest(BaseModel):
     endDate: Optional[str] = None
     description: Optional[str] = None
 
-
-# =====================
-# EDUCATION
-# =====================
 class EducationRequest(BaseModel):
     institution: str
     degree: str
@@ -60,32 +42,19 @@ class EducationRequest(BaseModel):
     startDate: str
     endDate: Optional[str] = None
 
-
-# =====================
-# SKILL
-# =====================
 class SkillRequest(BaseModel):
     name: str
-    level: str  # Basic | Intermediate | Advanced | Expert
+    level: str
 
-
-# =====================
-# SALARY
-# =====================
 class SalaryRequest(BaseModel):
     min: int
     max: int
 
-
-# =====================
-# DOCUMENT
-# =====================
 class DocumentRequest(BaseModel):
-    type: str   # resume | certificate
+    type: str
     name: str
     url: Optional[str] = None
     fileSize: Optional[int] = None
-
 
 class JobPostingCreateRequest(BaseModel):
     title: str
@@ -93,20 +62,15 @@ class JobPostingCreateRequest(BaseModel):
     employment_type: str
     location: str
     description: str
-
     min_education: str
     min_experience_years: int
-
     closing_date: Optional[date] = None
     required_candidates: int
-
-    # 🔥 WAJIB ADA
     skills: List[str]
     certifications: List[str]
-
-    class Config:
-        from_attributes = True  # Pydantic v2
 
 class ApplyJobRequest(BaseModel):
     job_id: int
 
+class AIMatchRequest(BaseModel):
+    job_id: int

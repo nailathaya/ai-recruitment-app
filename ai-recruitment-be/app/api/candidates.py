@@ -17,39 +17,40 @@ from app.schemas.request import (
     SalaryRequest,
     DocumentRequest,
 )
-from app.schemas.response import CandidateListResponse
+from app.models.application import Application
+from app.schemas.response import CandidateListItemResponse
 from app.core.database import get_db
 from app.api.deps import get_current_user
 
 
 router = APIRouter(prefix="/candidates", tags=["Candidates"])
 
-@router.get("/", response_model=List[CandidateListResponse])
-def get_all_candidates(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
-    # 🔐 Hanya HRD
-    if current_user.role != "hrd":
-        raise HTTPException(
-            status_code=403,
-            detail="Only HRD can access candidates"
-        )
+# @router.get("/", response_model=List[CandidateListItemResponse])
+# def get_all_candidates(
+#     db: Session = Depends(get_db),
+#     current_user: User = Depends(get_current_user),
+# ):
+#     # 🔐 Hanya HRD
+#     if current_user.role != "hrd":
+#         raise HTTPException(
+#             status_code=403,
+#             detail="Only HRD can access candidates"
+#         )
 
-    candidates = (
-        db.query(User)
-        .filter(User.role == "candidate")
-        .options(
-            joinedload(User.experiences),
-            joinedload(User.educations),
-            joinedload(User.skills),
-            joinedload(User.salary),
-            joinedload(User.documents),
-        )
-        .all()
-    )
+#     candidates = (
+#         db.query(User)
+#         .filter(User.role == "candidate")
+#         .options(
+#             joinedload(User.experiences),
+#             joinedload(User.educations),
+#             joinedload(User.skills),
+#             joinedload(User.salary),
+#             joinedload(User.documents),
+#         )
+#         .all()
+#     )
 
-    return candidates
+#     return candidates
 
 
 @router.get("/{candidate_id}")
@@ -202,3 +203,56 @@ def save_documents(candidate_id: int, data: list[DocumentRequest], db: Session =
         ))
     db.commit()
     return {"message": "Documents saved"}
+
+@router.get(
+    "/",
+    response_model=List[CandidateListItemResponse]
+)
+def get_all_candidates(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role != "hrd":
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    users = (
+        db.query(User)
+        .join(Application, Application.user_id == User.id)
+        .filter(User.role == "candidate")
+        .distinct()
+        .all()
+    )
+
+    result = []
+
+    for user in users:
+        # ambil lamaran TERBARU (kalau ada)
+        application = (
+            sorted(
+                user.applications,
+                key=lambda a: a.applied_at,
+                reverse=True
+            )[0]
+            if user.applications
+            else None
+        )
+
+        result.append({
+            "id": user.id,
+            "positionApplied": (
+                application.job.title
+                if application and application.job
+                else None
+            ),
+            "user": {
+                "id": user.id,
+                "name": user.full_name,
+                "email": user.email,
+                "location": user.location,
+                "role": user.role,
+                "onlineStatus": user.online_status,
+                "avatarUrl": user.avatar_url,
+            }
+        })
+
+    return result

@@ -3,15 +3,24 @@ from typing import List, Optional
 from datetime import datetime, date
 
 
+# class UserResponse(BaseModel):
+#     id: str
+#     name: str
+#     email: str
+#     location: str
+#     role: str
+#     onlineStatus: str
+#     avatarUrl: str
+
+
 class UserResponse(BaseModel):
-    id: str
+    id: int                     # ✅ FIX
     name: str
     email: str
-    location: str
+    location: Optional[str]
     role: str
-    onlineStatus: str
-    avatarUrl: str
-
+    onlineStatus: Optional[str]
+    avatarUrl: Optional[str]
 
 class SalaryExpectationResponse(BaseModel):
     min: int
@@ -81,8 +90,8 @@ class CandidateResponse(BaseModel):
     applicationHistory: List[ApplicationHistoryResponse]
 
 
-class CandidateListResponse(BaseModel):
-    candidates: List[CandidateResponse]
+# class CandidateListResponse(BaseModel):
+#     candidates: List[CandidateResponse]
 
 
 class LLMQueryResponse(BaseModel):
@@ -103,10 +112,24 @@ class JobPostingResponse(BaseModel):
         "from_attributes": True
     }
 
-class CandidateListResponse(BaseModel):
+class CandidateListItemResponse(BaseModel):
     id: int
     positionApplied: Optional[str]
     user: UserResponse
 
-    class Config:
-        from_attributes = True
+class AIMatchCandidateUser(BaseModel):
+    id: int
+    name: str
+    email: str
+    avatarUrl: Optional[str]
+
+class AIMatchCandidate(BaseModel):
+    id: int
+    user: AIMatchCandidateUser
+
+class AIMatchResponse(BaseModel):
+    candidate: AIMatchCandidate
+    fitScore: int
+    summary: str
+    matchingAspects: List[str]
+    aiReasons: List[str]
