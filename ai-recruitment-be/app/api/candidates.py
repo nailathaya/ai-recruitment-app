@@ -27,31 +27,112 @@ router = APIRouter(prefix="/candidates", tags=["Candidates"])
 
 @router.get("/{candidate_id}")
 def get_candidate(candidate_id: int, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.id == candidate_id).first()
+    user = (
+        db.query(User)
+        .options(
+            joinedload(User.experiences),
+            joinedload(User.educations),
+            joinedload(User.skills),
+            joinedload(User.salary),
+            joinedload(User.documents),
+            joinedload(User.applications)
+                .joinedload(Application.job),
+            joinedload(User.applications)
+                .joinedload(Application.stages),
+        )
+        .filter(User.id == candidate_id)
+        .first()
+    )
+
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
+    applications = []
+    for app in user.applications:
+        applications.append({
+            "id": app.id,
+            "job_id": app.job_id,
+            "position": app.job.title if app.job else "",
+            "applied_date": app.applied_at,
+            "status": app.status,
+            "stages": [
+                {
+                    "name": s.name,
+                    "status": s.status
+                }
+                for s in app.stages
+            ]
+        })
+
     return {
         "id": user.id,
-        "name": user.full_name,
-        "email": user.email,
-        "location": user.location or "",
-        "phone_number": user.phone_number or "",
-        "role": user.role,
-        "online_status": user.online_status,
+        "positionApplied": applications[0]["position"] if applications else None,
 
-        "salary_expectation": {
-            "min": user.salary.min_salary,
-            "max": user.salary.max_salary,
-        } if user.salary else {
-            "min": 0,
-            "max": 0,
+        "user": {
+            "id": user.id,
+            "name": user.full_name,
+            "email": user.email,
+            "location": user.location or "",
+            "phoneNumber": user.phone_number,
+            "role": user.role,
+            "onlineStatus": user.online_status,
+            "avatarUrl": user.avatar_url,
         },
-        "work_experience": user.experiences or [],
-        "education": user.educations or [],
-        "skills": user.skills or [],
-        "documents": user.documents or [],
+
+        "salaryExpectation": {
+            "min": user.salary.min_salary if user.salary else 0,
+            "max": user.salary.max_salary if user.salary else 0,
+        },
+
+        "workExperience": [
+            {
+                "id": e.id,
+                "jobTitle": e.job_title,
+                "companyName": e.company_name,
+                "startDate": e.start_date,
+                "endDate": e.end_date,
+                "description": e.description,
+            }
+            for e in user.experiences
+        ],
+
+        "education": [
+            {
+                "id": edu.id,
+                "institution": edu.institution,
+                "degree": edu.degree,
+                "fieldOfStudy": edu.field_of_study,
+                "startDate": edu.start_date,
+                "endDate": edu.end_date,
+            }
+            for edu in user.educations
+        ],
+
+        "skills": [
+            {
+                "id": s.id,
+                "name": s.name,
+                "level": s.level,
+            }
+            for s in user.skills
+        ],
+
+        "documents": [
+            {
+                "id": d.id,
+                "type": d.type,
+                "name": d.name,
+                "url": d.url,
+                "uploadedAt": d.created_at,
+                "fileSize": d.file_size,
+            }
+            for d in user.documents
+        ],
+
+        "activity": [],  # optional
+        "applicationHistory": applications,
     }
+
 
 
 @router.put("/{candidate_id}")

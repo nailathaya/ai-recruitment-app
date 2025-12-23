@@ -17,6 +17,8 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 @router.post("/register")
 def register_user(payload: RegisterRequest, db: Session = Depends(get_db)):
+    print("PASSWORD RAW:", payload.password)
+    print("PASSWORD LEN:", len(payload.password.encode("utf-8")))
     existing = db.query(User).filter(User.email == payload.email).first()
     if existing:
         raise HTTPException(status_code=400, detail="Email sudah teregistrasi")
@@ -32,6 +34,7 @@ def register_user(payload: RegisterRequest, db: Session = Depends(get_db)):
         avatar_url="https://i.pravatar.cc/150",
         online_status="offline",
     )
+    
 
     db.add(user)
     db.commit()

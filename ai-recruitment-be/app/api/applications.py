@@ -38,7 +38,7 @@ def apply_job(
     application = Application(
         user_id=current_user.id,
         job_id=payload.job_id,
-        status="Pending"
+        status="Belum"
     )
     db.add(application)
     db.commit()
@@ -56,7 +56,7 @@ def apply_job(
         ApplicationStage(
             application_id=application.id,
             name=stage,
-            status="Pending" 
+            status="Belum" 
         )
         for stage in DEFAULT_STAGES
     ]
@@ -161,7 +161,7 @@ def update_stage(
     if not stage:
         raise HTTPException(status_code=404, detail="Stage not found")
 
-    stage.stage_status = status
+    stage.status = status
     db.commit()
 
     return {"message": "Stage updated"}

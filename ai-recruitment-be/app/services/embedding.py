@@ -80,9 +80,9 @@ Ekspektasi Gaji: IDR {salary.get('min'):,} - {salary.get('max'):,}
 
 # --- FUNGSI UTAMA ---
 
-def generate_vector_store(docs):
+def generate_vector_store(docs, reset=False):
     # 1. Bersihkan database lama jika ada
-    if os.path.exists(CHROMA_PATH):
+    if reset and os.path.exists(CHROMA_PATH):
         shutil.rmtree(CHROMA_PATH)
   
     # print(f"🧠 Memuat Embedding Model: {MODEL_NAME}...")
@@ -104,24 +104,24 @@ def generate_vector_store(docs):
     except Exception as e:
         print(f"❌ Terjadi kesalahan: {e}")
 
-# def update_candidate_embedding(candidate: Dict):
-#     embedding_model = HuggingFaceEmbeddings(
-#         model_name=MODEL_NAME,
-#         model_kwargs={"device": "cpu"},
-#         encode_kwargs={"normalize_embeddings": True}
-#     )
+def update_candidate_embedding(candidate: Dict):
+    embedding_model = HuggingFaceEmbeddings(
+        model_name=MODEL_NAME,
+        model_kwargs={"device": "cpu"},
+        encode_kwargs={"normalize_embeddings": True}
+    )
 
-#     db = Chroma(
-#         persist_directory=CHROMA_PATH,
-#         embedding_function=embedding_model
-#     )
+    db = Chroma(
+        persist_directory=CHROMA_PATH,
+        embedding_function=embedding_model
+    )
 
-#     # 1. Hapus embedding lama kandidat ini
-#     db.delete(where={"candidate_id": candidate["id"]})
+    # 1. Hapus embedding lama kandidat ini
+    db.delete(where={"candidate_id": candidate["id"]})
 
-#     # 2. Buat embedding baru
-#     docs = process_candidates_to_documents([candidate])
-#     db.add_documents(docs)
+    # 2. Buat embedding baru
+    docs = process_candidates_to_documents([candidate])
+    db.add_documents(docs)
 
 
 # # if __name__ == "__main__":

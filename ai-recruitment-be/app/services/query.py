@@ -245,7 +245,7 @@ def score_candidates_with_llm(job_description: str, candidates_data: List[Dict])
                 "nama": "Nama Lengkap",
                 "skor": 0-100,
                 "analisis_singkat": "Alasan skor tersebut diberikan",
-                "rekomendasi": "Interview / Cadangan / Tolak"
+                "rekomendasi": "Lolos / Pertimbangkan /Tidak Lolos"
             }
         ]
     }

@@ -26,15 +26,13 @@ class ApplicationStage(Base):
     )
 
     status = Column(
-        Enum(
-            "Belum",
-            "Pending",
-            "Dalam Proses",
-            "Lolos",
-            "Tidak Lolos",
-            name="stage_status_enum",
-        ),
-        default="Belum",
-    )
+    Enum(
+        "Belum",
+        "Lolos",
+        "Tidak Lolos",
+        name="stage_status_enum",
+    ),
+    default="Belum",
+)
 
     application = relationship("Application", back_populates="stages")
