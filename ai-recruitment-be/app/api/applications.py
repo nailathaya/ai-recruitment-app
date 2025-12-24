@@ -127,6 +127,7 @@ def get_my_applications(
     for app in apps:
         result.append({
             "id": app.id,
+            "job_id": app.job_id,
             "position": app.job.title if app.job else "",
             # "company": app.job.company_name if app.job else "",
             "applied_at": app.applied_at,
