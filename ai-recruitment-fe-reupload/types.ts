@@ -111,7 +111,7 @@ export interface Profile {
 }
 
 export interface Job {
-    id: string;
+    id: number;
     title: string;
     company: string;
     location: string;

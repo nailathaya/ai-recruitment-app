@@ -35,6 +35,8 @@ const JobCard: React.FC<{ job: Job }> = ({ job }) => {
   const [isApplying, setIsApplying] = useState(false);
   console.log('job', job.id, 'hasApplied', hasApplied);
 
+  console.log('appliedJobIds', appliedJobIds);
+
   const handleApply = async () => {
     // ⛔ proteksi ganda
     if (hasApplied || isApplying) return;
@@ -191,7 +193,7 @@ const JobFilters: React.FC = () => {
 };
 
 const JobBoardPage: React.FC = () => {
-    const { filteredJobs, loading, fetchJobs, searchQuery, setSearchQuery } = useJobStore();
+    const { filteredJobs, loading, fetchJobs, searchQuery, setSearchQuery, appliedJobIds } = useJobStore();
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
 useEffect(() => {
