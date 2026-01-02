@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useJobStore } from '../store/useJobStore';
 import { Job, SelectedFilters } from '../types';
 import { SearchIcon, ChevronDownIcon, MenuIcon } from '../components/icons';
-import { FILTER_OPTIONS, MAX_SALARY } from '../constants';
+import { FILTER_OPTIONS } from '../constants';
 import companyLogo from '../components/company_logo.png';
 
 import { getMyApplications } from '../services/api';
@@ -45,7 +45,7 @@ const JobCard: React.FC<{ job: Job }> = ({ job }) => {
       <div className="flex-grow">
         <h3 className="text-xl font-bold text-gray-800">{job.title}</h3>
         <p className="text-gray-600">
-          {job.company} - {job.location}
+          {job.location}
         </p>
         {/* <p className="text-sm text-gray-500 mt-1">
           IDR {job.salary.min.toLocaleString('id-ID')} -{' '}
@@ -140,17 +140,17 @@ const JobFilters: React.FC = () => {
                 <button onClick={resetFilters} className="text-sm text-blue-600 hover:underline">Atur Ulang</button>
             </div>
             
-            <FilterSection title="Tingkat Pekerjaan">
+            {/* <FilterSection title="Tingkat Pekerjaan">
                 {FILTER_OPTIONS.jobLevel.map(level => <FilterButton key={level} label={level} filterType="jobLevel" value={level} />)}
-            </FilterSection>
+            </FilterSection> */}
 
             <FilterSection title="Tipe Anjuran">
-                {FILTER_OPTIONS.employmentType.map(type => <FilterButton key={type} label={type} filterType="employmentType" value={type} />)}
+                {FILTER_OPTIONS.employment_type.map(type => <FilterButton key={type} label={type} filterType="employmentType" value={type} />)}
             </FilterSection>
 
-            <FilterSection title="Fungsi Pekerjaan">
+            {/* <FilterSection title="Fungsi Pekerjaan">
                 {FILTER_OPTIONS.jobFunction.map(func => <FilterButton key={func} label={func} filterType="jobFunction" value={func} />)}
-            </FilterSection>
+            </FilterSection> */}
 
             {/* <div className="py-4 border-b">
                 <h4 className="font-semibold mb-3 text-gray-700">Gaji (Maksimal per bulan)</h4>

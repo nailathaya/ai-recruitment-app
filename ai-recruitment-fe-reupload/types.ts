@@ -230,7 +230,7 @@ export interface JobPosition {
 
 export interface FilterOptions {
     jobLevel: string[];
-    employmentType: string[];
+    employment_type: string[];
     jobFunction: string[];
     education: string[];
     company: string[];

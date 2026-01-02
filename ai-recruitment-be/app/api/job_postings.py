@@ -205,3 +205,59 @@ def get_job_by_id(
         raise HTTPException(status_code=404, detail="Job not found")
 
     return job
+
+@router.get("/{job_id}/ai-profile")
+def get_job_ai_profile(
+    job_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Endpoint khusus AI untuk mengambil job profile lengkap & terstruktur
+    """
+
+    if current_user.role not in ["hrd", "admin"]:
+        raise HTTPException(status_code=403, detail="Unauthorized")
+
+    job = (
+        db.query(JobPosting)
+        .options(
+            joinedload(JobPosting.skills),
+            joinedload(JobPosting.certifications),
+        )
+        .filter(JobPosting.id == job_id)
+        .first()
+    )
+
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    job_profile = {
+        "id": job.id,
+        "title": job.title,
+        "department": job.department,
+        "employment_type": job.employment_type,
+        "location": job.location,
+        "description": job.description,
+
+        "requirements": {
+            "min_education": job.min_education,
+            "min_experience_years": job.min_experience_years,
+            "skills": [s.skill_name for s in job.skills],
+            "certifications": [
+                c.certification_name for c in job.certifications
+            ],
+        },
+
+        "additional_info": {
+            "required_candidates": job.required_candidates,
+            "closing_date": (
+                job.closing_date.isoformat()
+                if job.closing_date
+                else None
+            ),
+            "status": job.status,
+        },
+    }
+
+    return job_profile
