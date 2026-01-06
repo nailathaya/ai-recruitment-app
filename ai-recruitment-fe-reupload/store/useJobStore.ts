@@ -50,37 +50,44 @@ export const useJobStore = create<JobState>((set, get) => ({
     })),
 
   fetchJobs: async () => {
-    set({ loading: true });
-    try {
-      const data = await getPublicJobs();
+  set({ loading: true });
+  try {
+    const data = await getPublicJobs();
 
-      // mapping backend → frontend Job type
-      const mappedJobs: Job[] = data.map((j: any) => ({
-        id: j.id,
-        title: j.title,
-        company: j.department || 'Perusahaan',
-        location: j.location,
-        employmentType: j.employment_type,
-        jobLevel: 'Entry Level', // bisa kamu derive nanti
-        jobFunction: j.department,
-        education: j.min_education,
-        salary: {
-          min: j.salary_min ?? 0,
-          max: j.salary_max ?? 0,
-        },
-        postedDate: j.created_at,
-        logoUrl: '/logo-default.png',
-        status: j.status,
-      }));
+    const mappedJobs: Job[] = data.map((j: any) => ({
+      id: j.id,
+      title: j.title,
+      location: j.location,
+      employmentType: j.employment_type,
+      jobFunction: j.department,
+      education: j.min_education,
 
-      set({
-        jobs: mappedJobs,
-        filteredJobs: mappedJobs,
-      });
-    } finally {
-      set({ loading: false });
-    }
-  },
+      jobLevel:
+        j.min_experience_years === 0
+          ? 'Fresh Graduate'
+          : j.min_experience_years <= 2
+          ? 'Junior'
+          : 'Senior',
+
+      skills: j.skills ?? [],
+      certifications: j.certifications ?? [],
+
+      closingDate: j.closing_date,
+      openPositions: j.required_candidates,
+
+      logoUrl: '/logo-default.png',
+      status: j.status === 'published' ? 'Published' : 'Closed',
+    }));
+
+    set({
+      jobs: mappedJobs,
+      filteredJobs: mappedJobs,
+    });
+  } finally {
+    set({ loading: false });
+  }
+},
+
 
   setSearchQuery: (q) => {
     set({ searchQuery: q });

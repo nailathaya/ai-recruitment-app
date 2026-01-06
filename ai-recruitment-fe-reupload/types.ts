@@ -41,11 +41,18 @@ export interface RecruitmentStage {
   status: 'Lolos' | 'Tidak Lolos' | 'Belum';
 }
 
+// export interface ApplicationHistory {
+//   id: number;
+//   job_id: number;
+//   applied_at: string;
+//   stages: RecruitmentStage[];
+// }
+
 export interface ApplicationHistory {
   id: number;
   job_id: number;
-  applied_at: string;
   stages: RecruitmentStage[];
+  aiScreening?: AIScreeningRecommendation; // 🔥 PINDAH KE SINI
 }
 
 
@@ -79,14 +86,30 @@ export interface CandidateDetail extends Candidate {
   activity?: Activity[];
 }
 
+export interface JobDetail {
+  description: string;
+  min_education: string;
+  min_experience_years: number;
+  department: string;
+  location: string;
+  required_candidates: number;
+  closing_date?: string;
+
+  skills: string[];
+  certifications: string[];
+}
+
+
+
 
 export interface Document {
     id: string;
     type: 'resume' | 'certificate';
-    name: string;
-    url: string;
+    file_name: string;
+    file_url: string;
     uploadedAt: string;
     fileSize?: number; // in bytes
+    description?: string;
 }
 
 export interface Activity {
@@ -111,24 +134,69 @@ export interface Profile {
 }
 
 export interface Job {
-    id: number;
-    title: string;
-    company: string;
-    location: string;
-    jobLevel: 'Internship' | 'Entry Level' | 'Associate' | 'Mid-Senior' | 'Director';
-    employmentType: 'Full Time' | 'Part Time' | 'Freelance' | 'Contractual' | 'Internship';
-    jobFunction: string;
-    education: string;
-    salary: {
-        min: number;
-        max: number;
-    };
-    postedDate: string;
-    logoUrl: string;
-    // HRD specific properties
-    applicants?: number; 
-    status?: 'Aktif' | 'Ditutup' | 'Draft' | 'Published' | 'Closed';
+  id: number;
+  title: string;
+  company: string;
+  location: string;
+  employmentType: 'Full Time' | 'Part Time' | 'Freelance' | 'Contractual' | 'Internship';
+  jobLevel: 'Internship' | 'Entry Level' | 'Associate' | 'Mid-Senior' | 'Director';
+  jobFunction: string;
+  education: string;
+  salary: {
+    min: number;
+    max: number;
+  };
+  postedDate: string;
+  logoUrl: string;
+  status?: 'published' | 'closed';
 }
+
+
+export interface JobListItem {
+  id: number;
+  title: string;
+  company: string;
+  location: string;
+  jobLevel: 'Internship' | 'Entry Level' | 'Associate' | 'Mid-Senior' | 'Director';
+  employmentType: 'Full Time' | 'Part Time' | 'Freelance' | 'Contractual' | 'Internship';
+  jobFunction: string;
+  education: string;
+  salary: {
+    min: number;
+    max: number;
+  };
+  postedDate: string;
+  logoUrl: string;
+  status?: 'Aktif' | 'Published';
+}
+
+export interface JobDetail {
+  id: number;
+  title: string;
+  department: string;
+  location: string;
+  employmentType: string;
+
+  description: string;
+
+  requirements: {
+    education: string;
+    experience_years: number;
+    skills: string[];
+    certifications: string[];
+  };
+
+  salary?: {
+    min: number;
+    max: number;
+  };
+
+  closingDate?: string;
+  openPositions: number;
+  status: 'Draft' | 'Published' | 'Closed';
+  createdAt: string;
+}
+
 
 export interface JobRequirements {
     education: string;
@@ -162,7 +230,7 @@ export interface JobPosition {
 
 export interface FilterOptions {
     jobLevel: string[];
-    employmentType: string[];
+    employment_type: string[];
     jobFunction: string[];
     education: string[];
     company: string[];

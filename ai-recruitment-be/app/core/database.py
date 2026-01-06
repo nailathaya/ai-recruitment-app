@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-DATABASE_URL = "mysql+pymysql://root@localhost/db_compro"
+DATABASE_URL = "mysql+pymysql://root@localhost/compro_db"
 
 engine = create_engine(DATABASE_URL)
 

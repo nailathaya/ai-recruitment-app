@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from typing import List, Optional
 from datetime import datetime, date
 
@@ -58,14 +58,17 @@ class ApplicationStageResponse(BaseModel):
     name: str
     status: str
 
+class AIScreeningResponse(BaseModel):
+    status: str # pass, review, reject
+    confidence: Optional[float]
+    reason: Optional[str]
 
 class ApplicationHistoryResponse(BaseModel):
-    id: str
+    id: int
+    job_id: int
     position: str
-    applied_date: str
-    status: str
     stages: List[ApplicationStageResponse]
-
+    aiScreening: Optional[AIScreeningResponse]
 
 class CandidateResponse(BaseModel):
     id: str
@@ -88,14 +91,40 @@ class JobPostingResponse(BaseModel):
     department: str
     employment_type: str
     location: str
+    description: str
+    min_education: str
+    min_experience_years: int
+    closing_date: Optional[date]
+    required_candidates: int
     status: str
 
-    closing_date: Optional[date]
-    created_at: datetime
+    skills: List[str]
+    certifications: List[str]
 
-    model_config = {
-        "from_attributes": True
-    }
+    @validator("skills", pre=True)
+    def map_skills(cls, v):
+        """
+        Convert:
+        [JobSkill(skill_name="Python"), JobSkill(skill_name="FastAPI")]
+        → ["Python", "FastAPI"]
+        """
+        if not v:
+            return []
+        return [s.skill_name for s in v]
+
+    @validator("certifications", pre=True)
+    def map_certs(cls, v):
+        """
+        Convert:
+        [JobCertification(certification_name="AWS")]
+        → ["AWS"]
+        """
+        if not v:
+            return []
+        return [c.certification_name for c in v]
+
+    class Config:
+        orm_mode = True
 
 class CandidateListItemResponse(BaseModel):
     id: int
@@ -119,3 +148,13 @@ class AIMatchResponse(BaseModel):
     summary: str
     matchingAspects: List[str]
     aiReason: str
+
+class CandidateUserResponse(BaseModel):
+    name: str
+    email: str
+
+class CandidateManagementResponse(BaseModel):
+    id: int
+    user: CandidateUserResponse
+    positionApplied: Optional[str]
+    applicationHistory: List[ApplicationHistoryResponse]

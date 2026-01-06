@@ -37,10 +37,11 @@ interface AIScreeningRecommendation {
 
 interface HrdState {
   // DATA
-  candidates: Candidate[] & {
-  aiScreening?: AIScreeningRecommendation
-};
+  candidates: (Candidate & {
+    aiScreening?: AIScreeningRecommendation;
+  })[];
   jobPostings: JobPosition[];
+  
 
   // DASHBOARD
   dashboardStats: DashboardStats;
@@ -62,6 +63,7 @@ interface HrdState {
   markAsRead: (id: string) => void;
   getCandidateById: (id: string) => Promise<Candidate | null>;
   updateStageStatus: (candidateId: string, applicationId: number, stageName: string, newStatus: RecruitmentStage['status']) => void;
+  getJobById: (id: string) => JobPosition | undefined;
 }
 
 /* =========================
@@ -106,20 +108,33 @@ export const useHrdStore = create<HrdState>((set, get) => ({
      👥 FETCH CANDIDATES
   ========================= */
   fetchCandidates: async () => {
-    set({ loading: true });
-    try {
-      const data = await getCandidates();
-      set({ candidates: data });
-    } catch (err) {
-      console.error('Failed to fetch candidatesdsdsds', err);
-    } finally {
-      set({ loading: false });
-    }
-  },
+  set({ loading: true });
+  try {
+    const data = await getCandidates();
+
+    set({
+      candidates: data.map((cand: any) => ({
+        ...cand,
+        aiScreening: cand.ai_screening ?? cand.aiScreening ?? null,
+      })),
+    });
+
+  } catch (err) {
+    console.error('Failed to fetch candidates', err);
+  } finally {
+    set({ loading: false });
+  }
+},
 
   /* =========================
      💼 FETCH JOB POSTINGS (INI KUNCI 🔥)
   ========================= */
+  getJobById: (id) => {
+    return get().jobPostings.find(
+      job => String(job.id) === String(id)
+    );
+  },
+
   fetchJobPostings: async () => {
     set({ loading: true });
     try {
@@ -133,21 +148,24 @@ export const useHrdStore = create<HrdState>((set, get) => ({
   /* =========================
      📊 DASHBOARD STATS
   ========================= */
-  fetchDashboardStats: async () => {
-    const jobs = get().jobPostings.length
-      ? get().jobPostings
-      : await getJobPostings();
+fetchDashboardStats: async () => {
+  let jobs = get().jobPostings;
 
-    set({
-      jobPostings: jobs,
-      dashboardStats: {
-        activeJobs: jobs.length,
-        totalApplicants: get().candidates.length,
-        avgFitScore: 78,
-        qualifiedCandidates: Math.floor(get().candidates.length * 0.6),
-      },
-    });
-  },
+  if (!jobs.length) {
+    jobs = await getJobPostings();
+    set({ jobPostings: jobs });
+  }
+
+  set({
+    dashboardStats: {
+      activeJobs: jobs.length,
+      totalApplicants: get().candidates.length,
+      avgFitScore: 78,
+      qualifiedCandidates: Math.floor(get().candidates.length * 0.6),
+    },
+  });
+},
+
 
   /* =========================
    🤖 AI MATCHING

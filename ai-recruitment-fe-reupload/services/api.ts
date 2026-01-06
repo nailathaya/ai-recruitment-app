@@ -6,10 +6,6 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 /* =====================
    AUTH HEADER
 ===================== */
-// function authHeader() {
-//   const token = localStorage.getItem("token");
-//   return token ? { Authorization: `Bearer ${token}` } : {};
-// }
 
 function authHeader() {
   const token = localStorage.getItem("access_token"); // ✅ SAMA
@@ -20,19 +16,6 @@ function authHeader() {
 /* =====================
    AUTH
 ===================== */
-// export async function loginCandidate(credentials: {
-//   email: string;
-//   password: string;
-// }) {
-//   const res = await fetch(`${API_BASE_URL}/auth/login`, {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify(credentials),
-//   });
-
-//   if (!res.ok) throw new Error("Login failed");
-//   return res.json();
-// }
 
 export async function loginCandidate(credentials: {
   email: string;
@@ -74,7 +57,7 @@ export async function registerCandidate(data: {
    CANDIDATE
 ===================== */
 export async function getCandidates() {
-  const res = await fetch(`${API_BASE_URL}/candidates/`, {
+  const res = await fetch(`${API_BASE_URL}/candidates/management`, {
     headers: authHeader(),
   });
 
@@ -223,6 +206,13 @@ export async function saveDocuments(
   candidateId: number,
   documents: Document[]
 ) {
+  const payload = documents.map((d) => ({
+    type: d.type,
+    file_name: d.file_name,
+    file_url: d.file_url,
+    description: d.description ?? null,
+    fileSize: d.fileSize ?? null,
+  }));
   const res = await fetch(
     `${API_BASE_URL}/candidates/${candidateId}/documents`,
     {
@@ -231,7 +221,7 @@ export async function saveDocuments(
         "Content-Type": "application/json",
         ...authHeader(),
       },
-      body: JSON.stringify(documents),
+      body: JSON.stringify(payload),
     }
   );
 
@@ -327,5 +317,39 @@ export async function applyJob(jobId: number | string) {
 
   return res.json();
 }
+
+export async function updateJobPosting(id: string, payload: any) {
+  const res = await fetch(`${API_BASE_URL}/job-postings/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) throw new Error('Failed to update job');
+  return res.json();
+}
+
+export async function getJobDetail(jobId: string | number) {
+  const res = await fetch(
+    `${import.meta.env.VITE_API_BASE_URL}/job-postings/${jobId}`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeader(),
+      },
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch job detail');
+  }
+
+  return res.json();
+}
+
+
 
 

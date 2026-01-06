@@ -2,32 +2,12 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useJobStore } from '../store/useJobStore';
 import { Job, SelectedFilters } from '../types';
 import { SearchIcon, ChevronDownIcon, MenuIcon } from '../components/icons';
-import { FILTER_OPTIONS, MAX_SALARY } from '../constants';
+import { FILTER_OPTIONS } from '../constants';
+import companyLogo from '../components/company_logo.png';
 
 import { getMyApplications } from '../services/api';
-// import { useJobStore } from '../store/useJobStore';
 
 import { applyJob } from '../services/api';
-//
-// const JobCard: React.FC<{ job: Job }> = ({ job }) => (
-//     <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-6">
-//         <img src={job.logoUrl} alt={`${job.company} logo`} className="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
-//         <div className="flex-grow">
-//             <h3 className="text-xl font-bold text-gray-800">{job.title}</h3>
-//             <p className="text-gray-600">{job.company} - {job.location}</p>
-//             <p className="text-sm text-gray-500 mt-1">IDR {job.salary.min.toLocaleString('id-ID')} - {job.salary.max.toLocaleString('id-ID')}</p>
-//             <div className="mt-3 flex flex-wrap gap-2">
-//                 <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-1 rounded-full">{job.jobLevel}</span>
-//                 <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full">{job.employmentType}</span>
-//             </div>
-//         </div>
-//         <div className="flex-shrink-0 text-right w-full sm:w-auto">
-//             <button onClick={() => applyJob(job.id)}
-//             className="bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">Lamar</button>
-//             <p className="text-xs text-gray-400 mt-2">Diposting {job.postedDate}</p>
-//         </div>
-//     </div>
-// );
 
 const JobCard: React.FC<{ job: Job }> = ({ job }) => {
   const { appliedJobIds, addAppliedJobId } = useJobStore();
@@ -38,40 +18,39 @@ const JobCard: React.FC<{ job: Job }> = ({ job }) => {
   console.log('appliedJobIds', appliedJobIds);
 
   const handleApply = async () => {
-    // ⛔ proteksi ganda
     if (hasApplied || isApplying) return;
 
     try {
-      setIsApplying(true); // ✅ KUNCI BUTTON
+      setIsApplying(true);
 
       await applyJob(job.id);
 
-      addAppliedJobId(job.id); // ✅ PERSIST KE STORE
+      addAppliedJobId(job.id);
       alert('Lamaran berhasil dikirim 🎉');
     } catch (err: any) {
       alert(err.message || 'Gagal melamar pekerjaan');
     } finally {
-      setIsApplying(false); // ✅ BUKA KUNCI (tapi hasApplied sudah true)
+      setIsApplying(false);
     }
   };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-6">
       <img
-        src={job.logoUrl}
-        alt={`${job.company} logo`}
+        src={companyLogo}
+        // alt={`${job.company} logo`}
         className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
       />
 
       <div className="flex-grow">
         <h3 className="text-xl font-bold text-gray-800">{job.title}</h3>
         <p className="text-gray-600">
-          {job.company} - {job.location}
+          {job.location}
         </p>
-        <p className="text-sm text-gray-500 mt-1">
+        {/* <p className="text-sm text-gray-500 mt-1">
           IDR {job.salary.min.toLocaleString('id-ID')} -{' '}
           {job.salary.max.toLocaleString('id-ID')}
-        </p>
+        </p> */}
 
         <div className="mt-3 flex flex-wrap gap-2">
           <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-1 rounded-full">
@@ -161,19 +140,19 @@ const JobFilters: React.FC = () => {
                 <button onClick={resetFilters} className="text-sm text-blue-600 hover:underline">Atur Ulang</button>
             </div>
             
-            <FilterSection title="Tingkat Pekerjaan">
+            {/* <FilterSection title="Tingkat Pekerjaan">
                 {FILTER_OPTIONS.jobLevel.map(level => <FilterButton key={level} label={level} filterType="jobLevel" value={level} />)}
-            </FilterSection>
+            </FilterSection> */}
 
             <FilterSection title="Tipe Anjuran">
-                {FILTER_OPTIONS.employmentType.map(type => <FilterButton key={type} label={type} filterType="employmentType" value={type} />)}
+                {FILTER_OPTIONS.employment_type.map(type => <FilterButton key={type} label={type} filterType="employmentType" value={type} />)}
             </FilterSection>
 
-            <FilterSection title="Fungsi Pekerjaan">
+            {/* <FilterSection title="Fungsi Pekerjaan">
                 {FILTER_OPTIONS.jobFunction.map(func => <FilterButton key={func} label={func} filterType="jobFunction" value={func} />)}
-            </FilterSection>
+            </FilterSection> */}
 
-            <div className="py-4 border-b">
+            {/* <div className="py-4 border-b">
                 <h4 className="font-semibold mb-3 text-gray-700">Gaji (Maksimal per bulan)</h4>
                 <input
                     type="range"
@@ -187,7 +166,7 @@ const JobFilters: React.FC = () => {
                 <div className="text-center mt-2 font-medium text-gray-600">
                     IDR {salaryRange[1].toLocaleString('id-ID')}
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 };
@@ -197,13 +176,15 @@ const JobBoardPage: React.FC = () => {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
 useEffect(() => {
-  if (!localStorage.getItem("access_token")) return;
-
   const loadData = async () => {
+    console.log('🔥 JobBoardPage mounted');
     await fetchJobs();
-    const apps = await getMyApplications();
-    const appliedIds = apps.map((a: any) => Number(a.job_id));
-    useJobStore.getState().setAppliedJobIds(appliedIds);
+
+    if (localStorage.getItem("access_token")) {
+      const apps = await getMyApplications();
+      const appliedIds = apps.map((a: any) => Number(a.job_id));
+      useJobStore.getState().setAppliedJobIds(appliedIds);
+    }
   };
 
   loadData();
