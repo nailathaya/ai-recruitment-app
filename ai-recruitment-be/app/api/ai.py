@@ -237,6 +237,7 @@
 #         reverse=True
 #     )
 
+
 #     for r in sorted_results:
 #         # print("R",r["id"], type(r["id"]))
 #         # print([app.user.id for app in applications], type(applications[0].user.id))
